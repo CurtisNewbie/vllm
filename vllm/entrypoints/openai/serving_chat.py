@@ -223,6 +223,10 @@ class OpenAIServingChat(OpenAIServing):
                         self.model_config.logits_processor_pattern,
                         default_sampling_params)
 
+                if sampling_params.min_tokens == 0:
+                    sampling_params.min_tokens = 2
+                    logger.info("set sampling_params.min_tokens = 2 to prevent empty response (if not work, increase model temperature)")
+
                 self._log_inputs(request_id,
                                  request_prompts[i],
                                  params=sampling_params,
@@ -932,8 +936,8 @@ class OpenAIServingChat(OpenAIServing):
         """
             Utility function to check if streamed tokens should go through the
             reasoning parser that was configured.
-    
-            We only want to do this IF reasoning is enabled and a reasoning 
+
+            We only want to do this IF reasoning is enabled and a reasoning
             parser is configured.
             """
         return self.enable_reasoning and self.reasoning_parser is not None
