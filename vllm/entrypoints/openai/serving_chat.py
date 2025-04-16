@@ -671,6 +671,7 @@ class OpenAIServingChat(OpenAIServing):
             yield f"data: {data}\n\n"
         # Send the final done message after all response.n are finished
         yield "data: [DONE]\n\n"
+        logger.info(f"Request {request_id} finished")
 
     async def chat_completion_full_generator(
         self,
@@ -693,6 +694,7 @@ class OpenAIServingChat(OpenAIServing):
             return self.create_error_response("Client disconnected")
         except ValueError as e:
             # TODO: Use a vllm-specific Validation Error
+            logger.info(f"Request {request_id} finished with error {e}")
             return self.create_error_response(str(e))
 
         assert final_res is not None
@@ -854,6 +856,7 @@ class OpenAIServingChat(OpenAIServing):
             prompt_logprobs=final_res.prompt_logprobs,
         )
 
+        logger.info(f"Request {request_id} finished")
         return response
 
     def _get_top_logprobs(
